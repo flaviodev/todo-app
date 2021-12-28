@@ -1,9 +1,17 @@
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
+  darkMode: false, // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        '128': '32rem'
+      }      
+    },
   },
-  plugins: [],
+  variants: {
+    extend: {
+    },
+  },
+  plugins: [
+  ],
 }
