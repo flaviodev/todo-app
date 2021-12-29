@@ -14,5 +14,5 @@ const TodoListTemplate: ComponentStory<typeof TodoList> = (args) => <TodoList {.
 export const Default = TodoListTemplate.bind({});
 
 Default.args = {
-  todos: [ {task: "task 1", done: true} , {task: "task 2", done: false} , {task: "task 3"} ]
+  todos: [ {taskId: 1, task: "task 1", done: true} , {taskId: 2, task: "task 2", done: false} , {taskId: 3, task: "task 3"} ]
 };

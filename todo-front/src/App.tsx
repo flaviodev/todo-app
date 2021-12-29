@@ -5,7 +5,7 @@ import { Todo } from './components/Todo';
 
 function App() {
   return (
-    <Todo  task='My task' done={true}/>
+    <Todo taskId={0} task='My task' done={true}/>
   );
 }
 

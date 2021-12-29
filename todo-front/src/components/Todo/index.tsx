@@ -1,15 +1,22 @@
-import React, { useState, useEffect, FunctionComponent} from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactTooltip from 'react-tooltip';
+import { TrashIcon } from '@heroicons/react/outline';
 
 export type TodoProps = {
+    taskId: number,
     task: string,
     done?: boolean,
+    onSave?: (id: number) => void,
+    onDelete?: (id: number) => void
 };
 
 export const Todo: React.FC<TodoProps & React.HTMLAttributes<HTMLDivElement>> = (props) => {
     
-    const { task } = props;
+    const { taskId, task } = props;
     const done = props.done ? props.done : false;
+    const onDelete = props.onDelete ? props.onDelete : (id: number) => { console.log('Todo:onDelete not implemented')};
+    const onSave = props.onSave ? props.onSave : (id: number) => { console.log('Todo:onSave not implemented')};
+
     const [checked, setChecked] = useState(done);
     const [taskValue, setTaskValue] = useState(task);
     const [editing, setEditing] = useState(false);
@@ -76,7 +83,7 @@ export const Todo: React.FC<TodoProps & React.HTMLAttributes<HTMLDivElement>> = 
             )}
 
             <span className='flex-none mx-1'>
-                {' '}
+                <TrashIcon className='h-5 w-5 text-red-400 cursor-pointer' onClick={() => onDelete(taskId) }/>
             </span>
         </div>
 
