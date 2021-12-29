@@ -1,28 +1,88 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, FunctionComponent} from 'react';
+import ReactTooltip from "react-tooltip";
 
-type Props = {
+type TodoProps = {
     task: string,
     done: boolean,
 };
 
-export const Todo = ({task, done}: Props) => {
+export const Todo : FunctionComponent<TodoProps> = ({task, done}) => {
     const [checked, setChecked] = useState(done);
+    const [taskValue, setTaskValue] = useState(task);
+    const [editing, setEditing] = useState(false);
+    const [truncated, setTruncated] = useState(false);
+
+
+    const taskInput: React.LegacyRef<HTMLInputElement> = React.createRef();
+    const taskLabel: React.LegacyRef<HTMLSpanElement> = React.createRef();
+
+    const checkTruncate = () => {
+        let offsetWidth = taskLabel.current?.offsetWidth ? taskLabel.current?.offsetWidth : 0;
+        let scrollWidth = taskLabel.current?.scrollWidth ? taskLabel.current?.scrollWidth : 0;
+
+        scrollWidth > offsetWidth ? setTruncated(true) : setTruncated(false);
+    };
 
     useEffect(() => {
         setChecked(done)
     }, [done]);
 
+    useEffect(() => {
+        setTaskValue(task)
+    }, [task]);
+
+    useEffect(() => {
+        checkTruncate();
+    }, [taskValue]);
+
+    useEffect(() => {
+        checkTruncate();
+        if(editing) taskInput.current?.focus();
+    }, [editing]);
+
     return (
-    <div className="w-80 rounded-lg p-5 shadow-lg text-center">
-        <input 
-            className="w-5 h-5 checked:bg-blue-500"         
-            type="checkbox" 
-            checked={checked}
-            onClick={() => setChecked(!checked)}
-        />
-        <span className={`ml-5 text-3xl font-bold ${checked ? "line-through" : ""}`}>
-          {task}
-        </span>
-      </div>
+    <>
+        <div className="w-80 h-8 items-center rounded-lg shadow-lg border flex">
+            <input 
+                className="min-h-5 min-w-5 mx-1 accent-blue-500/25 cursor-pointer flex-none"         
+                type="checkbox" 
+                checked={checked}
+                onChange={() => setChecked(!checked)}
+            />
+
+            {!editing ? (
+                <span 
+                    data-tip 
+                    data-for="registerTip" 
+                    className={`truncate ${checked ? "line-through" : ""} mx-1 grow`}
+                    onClick={() => setEditing(true)}
+                    ref={taskLabel}
+                >
+                    {taskValue}
+                </span>
+            ) : (
+                <input 
+                    className="mx-1 grow"
+                    type="text"
+                    value={taskValue}
+                    onChange={(event) => {setTaskValue(event.target.value)}}
+                    onBlur={() => setEditing(false)}
+                    onFocus={(event) => event.currentTarget.select()}
+                    ref={taskInput}
+                    onKeyPress={(event) => { if(event.key === "Enter") event.currentTarget.blur() }}
+                />
+            )}
+
+            <span className="flex-none mx-1">
+                {" "}
+            </span>
+        </div>
+
+        {!editing && truncated && (
+            <ReactTooltip id="registerTip" place="bottom" effect="solid">
+                {taskValue}
+            </ReactTooltip>
+        )}
+    </>
     );
 }; 

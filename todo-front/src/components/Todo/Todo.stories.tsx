@@ -9,10 +9,9 @@ export default {
   component: Todo,
 } as ComponentMeta<typeof Todo>;
 
-//👇 We create a “template” of how args map to rendering
-const Template: ComponentStory<typeof Todo> = (args) => <Todo {...args} />;
+const TodoTemplate: ComponentStory<typeof Todo> = (args) => <Todo {...args} />;
 
-export const Default = Template.bind({});
+export const Default = TodoTemplate.bind({});
 
 Default.args = {
   task: "Task name",
