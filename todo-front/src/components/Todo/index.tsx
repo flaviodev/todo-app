@@ -62,7 +62,7 @@ export const Todo: React.FC<TodoProps & React.HTMLAttributes<HTMLDivElement>> = 
             {!editing ? (
                 <span 
                     data-tip 
-                    data-for='registerTip' 
+                    data-for={`todoTooltip-${taskId}`} 
                     className={`truncate ${checked ? 'line-through' : ''} mx-1 grow`}
                     onClick={() => setEditing(true)}
                     ref={taskLabel}
@@ -88,7 +88,7 @@ export const Todo: React.FC<TodoProps & React.HTMLAttributes<HTMLDivElement>> = 
         </div>
 
         {!editing && truncated && (
-            <ReactTooltip id='registerTip' place='bottom' effect='solid'>
+            <ReactTooltip id={`todoTooltip-${taskId}`} place='bottom' effect='solid'>
                 {taskValue}
             </ReactTooltip>
         )}

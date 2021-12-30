@@ -38,7 +38,7 @@ export const TodoList: React.FC<TodoListProps & React.HTMLAttributes<HTMLDivElem
         <>
         <div className='w-80'>
             <div className='border-b flex'>
-                <div className='ml-1 grow'>Todo List</div>
+                <div className='ml-1 grow'>Todo List ({todos.length})</div>
                 <div className='mr-1 flex-none'>
                     <PlusCircleIcon className='h-5 w-5 text-green-500 cursor-pointer' onClick={() => addNewTodo()}/>
                 </div>
