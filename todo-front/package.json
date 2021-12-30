@@ -2,6 +2,7 @@
   "name": "todo-front",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3100",
   "dependencies": {
     "@heroicons/react": "^1.0.5",
     "@tailwindcss/postcss7-compat": "^2.2.17",

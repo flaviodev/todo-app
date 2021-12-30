@@ -1,11 +1,10 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { Todo } from './components/Todo';
+
+import { TodoPanel } from './components/TodoPanel';
 
 function App() {
   return (
-    <Todo taskId={0} task='My task' done={true}/>
+    <TodoPanel todos={[]}/>
   );
 }
 
