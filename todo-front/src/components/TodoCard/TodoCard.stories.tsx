@@ -1,6 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import { TodoCard } from '.';
+import { Todo } from '../../domain/Todo';
 
 export default {
   title: 'TodoCard',
@@ -14,7 +15,5 @@ export const Default = TodoCardTemplate.bind({});
 Default.args = {
   todoId: 1,
   task: 'Task name',
-  done: true,
-  onRemove: (id:number) => alert('Todo was removed'),
-  onUpdate: (id:number) => alert('Todo was updated'),
+  done: true
 };

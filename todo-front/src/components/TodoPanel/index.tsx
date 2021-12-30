@@ -4,27 +4,24 @@ import { Todo } from '../../domain/Todo';
 import { NewTaskName, TodoCard } from '../TodoCard';
 
 type TodoPanelProps = {
+    todos: Array<Todo>,
     header?: string,
-    todos?: Array<Todo>,
+    onAdd?:(todo:Todo) => void,
+    onRemove?: (id: number) => void,
+    onUpdate?: (todo: Todo) => void 
 };
 
 export const TodoPanel: React.FC<TodoPanelProps & React.HTMLAttributes<HTMLDivElement>> = (props) => {
-    const { header = 'Todo List'} = props;
-    const [ todos, setTodos ] = useState(props.todos ? props.todos : []);    
+    const { todos, header = 'Todo List' } = props;
+    const { onAdd = todo => {}, onRemove = todo => {}, onUpdate = todo => {} } = props;
     const [ todoCards, setTodoCards ] = useState(Array<JSX.Element>());
-    const [ data, setData ] = useState([]);
 
     const addTodo = () => {
-        setTodos(todos.concat(new Todo({id: 0, task: NewTaskName})));
+        onAdd(new Todo({id: 0, task: NewTaskName}));
     };
 
     const removeTodo = (id: number) => {
-        let filtered = todos.filter(e => e.id !== id);
-        setTodos(filtered);
-    }
-
-    const updateTodo = (id: number) => {
-        console.log('update todo');
+        onRemove(id);
     }
 
     const renderTodoCard = (todo: Todo) => (
@@ -34,7 +31,7 @@ export const TodoPanel: React.FC<TodoPanelProps & React.HTMLAttributes<HTMLDivEl
             todoId={todo.id} 
             task={todo.task} 
             done={todo.done} 
-            onUpdate={updateTodo}
+            onUpdate={onUpdate}
             onRemove={removeTodo} 
         />);
 
@@ -42,24 +39,9 @@ export const TodoPanel: React.FC<TodoPanelProps & React.HTMLAttributes<HTMLDivEl
         setTodoCards(todos.map(e => renderTodoCard(e)));
     }, [todos]);
 
-    const fetchTodos = () => {
-        fetch('/todos', {
-            headers : { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-             }
-          })
-          .then((response) => response.json())
-          .then((result) => setTodos(Array<Todo>(...result)));
-    }
-
-    useEffect(() => {
-        fetchTodos()
-    },[])
-
     return (
         <>
-        <div className='w-80'>
+        <div className='w-80 m-3'>
             <div className='border-b flex'>
                 <div className='ml-1 grow'>{header} ({todos.length})</div>
                 <div className='mr-1 flex-none'>
@@ -68,11 +50,6 @@ export const TodoPanel: React.FC<TodoPanelProps & React.HTMLAttributes<HTMLDivEl
             </div>
             <div>
                 {todoCards}
-            </div>
-            <div>
-                <ul>
-                    {data.map((e:any) => <li key={e.id}>{e.task}</li> )}
-                </ul>
             </div>
         </div>
         </>

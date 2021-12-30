@@ -12,6 +12,9 @@ const TodoPanelTemplate: ComponentStory<typeof TodoPanel> = (args) => <TodoPanel
 
 export const Default = TodoPanelTemplate.bind({});
 
+let todos = [ new Todo({id: 1, task: 'Task 1'}) , new Todo({id: 2, task: 'Task 2', done: true}) , new Todo({id: 3, task: 'Task Test with a lot of chars to show in the card space'}) ];
+
 Default.args = {
-  todos:  [ new Todo({id: 1, task: 'Task 1'}) , new Todo({id: 2, task: 'Task 2', done: true}) , new Todo({id: 3, task: 'Task Test with a lot of chars to show in the card space'}) ], 
+  todos: todos,
+  header: 'Storybook Todo List',
 };
