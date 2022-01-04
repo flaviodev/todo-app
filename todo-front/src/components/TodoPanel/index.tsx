@@ -20,24 +20,19 @@ export const TodoPanel: React.FC<TodoPanelProps & React.HTMLAttributes<HTMLDivEl
         onAdd(new Todo({id: 0, task: NewTaskName}));
     };
 
-    const removeTodo = (id: number) => {
-        onRemove(id);
-    }
-
-    const renderTodoCard = (todo: Todo) => (
-        <TodoCard 
+    useEffect(() => {
+        const renderTodoCard = (todo: Todo) => <TodoCard 
             key={todo.id} 
             className='my-2' 
             todoId={todo.id} 
             task={todo.task} 
             done={todo.done} 
             onUpdate={onUpdate}
-            onRemove={removeTodo} 
-        />);
+            onRemove={onRemove} 
+        />;
 
-    useEffect(() => {
         setTodoCards(todos.map(e => renderTodoCard(e)));
-    }, [todos]);
+    }, [todos, onUpdate, onRemove]);
 
     return (
         <>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, FocusEvent, KeyboardEvent, ChangeEvent } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { TrashIcon } from '@heroicons/react/outline';
 import { Todo } from '../../domain/Todo';
@@ -14,97 +14,78 @@ export type TodoCardProps = {
 export const NewTaskName = "New Task";
 
 export const TodoCard: React.FC<TodoCardProps & React.HTMLAttributes<HTMLDivElement>> = (props) => {
-    const { todoId, task, done = false } = props;
+    const { todoId } = props;
+    const [task, setTask] = useState(props.task)
+    const [previousTask, setPreviousTask] = useState(props.task);
+    const [done = false, setDone] = useState(props.done)
     const { onUpdate = todo => {} , onRemove = todo => {} } = props;
-    const [isDoneChecked, setDoneChecked] = useState(done);
-    const [taskInputValue, setTaskInputValue] = useState(task);
-    const [isTaskInputOnEdition, setTaskInputOnEdition] = useState(false);
-    const [isTaskSpanTruncated, setTaskSpanTruncated] = useState(false);
+    const [isTaskTruncated, setTaskTruncated] = useState(false);
 
-    const taskInput: React.LegacyRef<HTMLInputElement> = React.createRef();
-    const taskSpan: React.LegacyRef<HTMLSpanElement> = React.createRef();
+    const focusHandler = useCallback((event: FocusEvent<HTMLInputElement>) => {
+        setTaskTruncated(false);
+        event.currentTarget.select();
+    }, []);
 
-    const checkIsTaskSpanTruncated = () => {
-        let offsetWidth = taskSpan.current?.offsetWidth ? taskSpan.current?.offsetWidth : 0;
-        let scrollWidth = taskSpan.current?.scrollWidth ? taskSpan.current?.scrollWidth : 0;
-
-        scrollWidth > offsetWidth ? setTaskSpanTruncated(true) : setTaskSpanTruncated(false);
-    };
-
-    useEffect(() => {
-        setDoneChecked(done);
-    }, [done]);
-
-    useEffect(() => {
-        setTaskInputValue(task);
-    }, [task]);
-
-    useEffect(() => {
-        checkIsTaskSpanTruncated();
-    }, [taskInputValue]);
-
-    useEffect(() => {
-        checkIsTaskSpanTruncated();
-
-        if(isTaskInputOnEdition) { 
-            taskInput.current?.focus();
-        } else {
-            if(taskInputValue.trim().length == 0) 
-                setTaskInputValue(NewTaskName);
+    const keyHandler = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
+        if(event.key === 'Enter') {
+            event.currentTarget.blur()
         }
+    }, []);
 
-    }, [isTaskInputOnEdition]);
+    const changeHandler = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setTask(event.currentTarget.value)
+    }, []);
+
+    const blurHandler = useCallback((event: FocusEvent<HTMLInputElement>) => {
+        let offsetWidth = event.target.offsetWidth ? event.target.offsetWidth : 0;
+        let scrollWidth = event.target.scrollWidth ? event.target.scrollWidth : 0;
+
+        scrollWidth > offsetWidth ? setTaskTruncated(true) : setTaskTruncated(false);
+
+        if(event.target.value.trim().length > 0) {
+            if(previousTask !== task) {
+                setPreviousTask(task);
+                onUpdate(new Todo({id: todoId, task: task, done: done}));
+            }
+        } else {
+            setTask(previousTask);
+        }
+    }, [todoId, task, done, previousTask, onUpdate]);
 
     return (
     <>
         <div className={`w-80 h-8 items-center rounded-lg shadow-lg border flex ${props.className}`}>
             <input 
-                className='min-h-5 min-w-5 mx-1 accent-blue-500/25 cursor-pointer flex-none'         
+                className='min-h-5 min-w-5 mx-1 accent-blue-500/25 cursor-pointer flex-none'
                 type='checkbox' 
-                checked={isDoneChecked}
-                onChange={() => {
-                    setDoneChecked(!isDoneChecked);
-                    onUpdate(new Todo({id: todoId, task: taskInputValue, done: !isDoneChecked}));
-                }}
+                checked={done}
+                onClick={() => setDone(!done)}
+                onChange={() => onUpdate(new Todo({id: todoId, task: task, done: !done}))}
             />
 
-            {!isTaskInputOnEdition ? (
-                <span 
-                    data-tip 
-                    data-for={`todoTooltip-${todoId}`} 
-                    className={`truncate ${isDoneChecked ? 'line-through' : ''} mx-1 grow`}
-                    onClick={() => setTaskInputOnEdition(true)}
-                    ref={taskSpan}
-                >
-                    {taskInputValue}
-                </span>
-            ) : (
-                <input 
-                    className='mx-1 grow'
-                    type='text'
-                    placeholder='New Task'
-                    value={taskInputValue}
-                    onChange={(event) => {setTaskInputValue(event.target.value)}}
-                    onFocus={(event) => event.currentTarget.select()}
-                    ref={taskInput}
-                    onKeyPress={(event) => { if(event.key === 'Enter') event.currentTarget.blur() }}
-                    onBlur={(event) => { 
-                        setTaskInputOnEdition(false); 
-                        onUpdate(new Todo({id: todoId, task: event.currentTarget.value, done: isDoneChecked}));
-                    }}
+            <input 
+                value={task}
+                data-tip 
+                data-for={`todoTooltip-${todoId}`} 
+                className={`truncate mx-1 grow ${done ? 'line-through' : ''}`}
+                type='text'
+                placeholder='Task name'
+                onFocus={focusHandler}
+                onKeyPress={keyHandler}
+                onChange={changeHandler}
+                onBlur={blurHandler}                    
                 />
-            )}
 
             <span className='flex-none mx-1'>
                 <TrashIcon className='h-5 w-5 text-red-400 cursor-pointer' onClick={() => onRemove(todoId) }/>
             </span>
         </div>
 
-        {!isTaskInputOnEdition && isTaskSpanTruncated && (
+        {isTaskTruncated && (
             <ReactTooltip id={`todoTooltip-${todoId}`} place='bottom' effect='solid'>
-                {taskInputValue}
+                {task}
             </ReactTooltip>
         )}
     </>
     );
-}; 
+};
